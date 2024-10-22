@@ -8,6 +8,24 @@
 #include <string.h>
 
 
+char *parseFunction(char *startFunction) { 
+  printf("%s", startFunction);
+  int len = strlen(startFunction);
+  char *result = (char *)malloc(sizeof(char) * len);
+ 
+  for(int i = 0; i < len - 1; i++) {
+    if(startFunction[i] == '(') { 
+        strcat(result, &startFunction[i]);
+      }
+    }
+  
+  result++;
+  len = strlen(result);
+
+  result[len - 1] = '\0';
+  return result;
+
+}
 //returns 1 if function starts with a - 
 int isNegative(char *startFunction) { 
   int flag = 0;
@@ -143,108 +161,97 @@ char *powerRule(char *startFunction) {
 char *trigFunction(char *startFunction) { 
   
   int len = strlen(startFunction);
-  int flag = isNegative(startFunction);
+  int signFlag = isNegative(startFunction);
+  int xFlag = 0;
   char *result = (char *)malloc(sizeof(char) * len);
-
+  char *insideFunction = parseFunction(startFunction);
+  if(strcmp(insideFunction, "x") == 1) { 
+     
+  }
   //iterates pointer to remove first character
-  if(flag == 1) { 
+  if(signFlag == 1) { 
     startFunction++;
   }
-  
   switch(startFunction[0]) { 
     case 'c':
+       
       if(startFunction[2] == 's') {
-        if(flag == 1) { 
-          strcpy(result, "sin(x)");
-          return result;
+        if(signFlag == 1) { 
+          sprintf(result, "sin(%s)", insideFunction);
           break;
         } else { 
-          strcpy(result, "-sin(x)");
-          return result;
+          sprintf(result, "-sin(%s)", insideFunction); 
           break; 
         }
       } else if(startFunction[2] == 't') { 
-          if(flag == 1) { 
-            strcpy(result, "csc^2(x)");
-            return result;
+          if(signFlag == 1) { 
+            sprintf(result, "csc^2(%s)", insideFunction); 
             break;
-          } else { 
-            strcpy(result, "-csc^2(x)");
-            return result;
+          } else {  
+            sprintf(result, "-csc^2(%s)", insideFunction); 
             break; 
         }
       } else { 
-          if(flag == 1) { 
-            strcpy(result, "csc(x)cot(x)");
-            return result;
+          if(signFlag == 1) { 
+            sprintf(result, "csc(%s)cot(%s)", insideFunction, insideFunction); 
             break;
           } else { 
-            strcpy(result, "-csc(x)cot(x)");
-            return result;
+            sprintf(result, "-csc(%s)cot(%s)", insideFunction, insideFunction); 
             break; 
           }
       }
     case 's':
       if(startFunction[1] == 'i') { 
-        if(flag == 1) { 
-          strcpy(result, "-cos(x)");
-          return result;
+        if(signFlag == 1) {  
+          sprintf(result, "-cos(%s)", insideFunction); 
           break;
-        } else { 
-          strcpy(result, "cos(x)");
-          return result;
+        } else {  
+          sprintf(result, "cos(%s)", insideFunction); 
           break;
         } 
       } else {     
-        if(flag == 1) { 
-          strcpy(result, "-sec(x)tan(x)");
-          return result;
+        if(signFlag == 1) {  
+          sprintf(result, "-sec(%s)tan(%s)", insideFunction, insideFunction); 
           break;
-        } else { 
-          strcpy(result, "sec(x)tan(x)");
-          return result;
+        } else {  
+          sprintf(result, "sec(%s)tan(%s)", insideFunction, insideFunction); 
           break;
         }
       }
     case 't':
-      if(flag == 1) { 
-        strcpy(result, "-sec^2(x)");
-        return result;
+      if(signFlag == 1) {  
+        sprintf(result, "sec^2(%s)", insideFunction); 
         break;
-      } else { 
-        strcpy(result, "sec^2(x)");
-        return result;
+      } else {  
+        sprintf(result, "-sec^2(%s)", insideFunction); 
         break;
       } 
   }
-  return NULL;
-}
-
-char *parseFunction(char *startFunction) { 
-  printf("%s", startFunction);
-  int len = strlen(startFunction);
-  char *result = (char *)malloc(sizeof(char) * len);
- 
-  for(int i = 0; i < len - 1; i++) {
-    if(startFunction[i] == '(') { 
-        strcat(result, &startFunction[i]);
-      }
+  if(strcmp(insideFunction, "x\0") == 1) { 
+    return result;
+  } else {
+    if(result[0] == '-') {
+      signFlag = 1;
     }
-  
-  result++;
-  len = strlen(result);
-
-  result[len - 1] = '\0';
+    char *insideDeriv = powerRule(insideFunction);
+    char *temp = result;
+    if(signFlag == 1) { 
+      result++;
+      strcat(insideDeriv, result);
+      memmove(insideDeriv + 1, insideDeriv, strlen(insideDeriv) + 1);
+      insideDeriv[0] = '-';
+    } else { 
+      strcat(insideDeriv, result);
+    }
+    return insideDeriv;
+  } 
   return result;
-
 }
+
 
 int main() {
   char testFunction[256];
   printf("Function to differentiate: ");
   scanf("%s", testFunction);
-
-  printf("Inside function: %s\n", parseFunction(testFunction));
   printf("Trig Derivative: %s\n", trigFunction(testFunction));
-  printf("Power Rule Derivative: %s\n", powerRule(testFunction));
 }
