@@ -232,6 +232,8 @@ char *trigFunction(char *startFunction) {
   } else {
     if(result[0] == '-') {
       signFlag = 1;
+    } else {
+      signFlag = 0;
     }
     char *insideDeriv = powerRule(insideFunction);
     char *temp = result;
@@ -251,7 +253,15 @@ char *trigFunction(char *startFunction) {
 
 int main() {
   char testFunction[256];
-  printf("Function to differentiate: ");
-  scanf("%s", testFunction);
-  printf("Trig Derivative: %s\n", trigFunction(testFunction));
+
+  // runs prompt until user enters quit
+  while(strcmp(testFunction, "quit")) {  
+    printf("Function to differentiate: ");
+    scanf("%s", testFunction);   
+    if(!strcmp(testFunction, "quit\0")) { 
+      return 0;
+    }
+    printf("Trig Derivative: %s\n", trigFunction(testFunction));
+  }
+  return 0;
 }
