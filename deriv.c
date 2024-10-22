@@ -104,17 +104,32 @@ char *powerRule(char *startFunction) {
   power = parsePower(startFunction);
   base = parseBase(startFunction);
   flag = isFunctionOfX(startFunction);
-
+  
   if ((power == 0) & (flag == 1)) {
+    if(base == 0) { 
+      base = 1;
+    }
     sprintf(result, "%d", base);
     return result;
   } else if ((power == 0) & (flag == 0)) {
     return NULL;
   } else if ((power != 0) & (flag == 1)) {
+    if(base == 0) { 
+      base = 1;
+    } else if(power == 0) { 
+      power = 1;
+    } else if(power == 0 & base == 0) {
+      base = 1;
+      power = 1;
+    }
+
     base = base * power;
     power = power - 1;
     if (power == 1) {
       sprintf(result, "%dx", base);
+      return result;
+    } else if(power == 0) {
+      sprintf(result, "%d", base);
       return result;
     } else {
       sprintf(result, "%dx^%d", base, power);
@@ -205,26 +220,31 @@ char *trigFunction(char *startFunction) {
   return NULL;
 }
 
-int main() {
-
-  char *testFunction = "56x^43";
-  char *testFunction3 = "2x^200";
-  char *testFunction2 = "5x^2";
-  char *testFunction5 = "7012x^2013";
-  char *testFunction4 = "909090900x^2";
-  char *testFunction1 = "-csc(x)";
+char *parseFunction(char *startFunction) { 
+  printf("%s", startFunction);
+  int len = strlen(startFunction);
+  char *result = (char *)malloc(sizeof(char) * len);
+ 
+  for(int i = 0; i < len - 1; i++) {
+    if(startFunction[i] == '(') { 
+        strcat(result, &startFunction[i]);
+      }
+    }
   
-  printf("Derivative of %s is %s\n", testFunction1 ,trigFunction(testFunction1));
+  result++;
+  len = strlen(result);
 
-  char *result = powerRule(testFunction);
+  result[len - 1] = '\0';
+  return result;
 
-  if (result == NULL) {
-    printf("Derivative of %s is 0\n", testFunction);
-  } else {
-    printf("Derivative of %s is %s\n", testFunction, result);
-  }
-  powerRule(testFunction3);
-  powerRule(testFunction2);
-  powerRule(testFunction4);
-  powerRule(testFunction5);
+}
+
+int main() {
+  char testFunction[256];
+  printf("Function to differentiate: ");
+  scanf("%s", testFunction);
+
+  printf("Inside function: %s\n", parseFunction(testFunction));
+  printf("Trig Derivative: %s\n", trigFunction(testFunction));
+  printf("Power Rule Derivative: %s\n", powerRule(testFunction));
 }
