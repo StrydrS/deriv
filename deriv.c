@@ -96,6 +96,21 @@ char *floatToFrac(float f, int divisor) {
   sprintf(frac, "%d/%d", dividend + 1, divisor);
   return frac;
 }
+char *getInsideFunction(char *startFunction) { 
+  int len = strlen(startFunction);
+  char *result = (char *)malloc(sizeof(char) * len);
+  int flag = 0;
+
+  while ((len > 0) & (flag == 0)) {
+    if ((startFunction[len] != 'x') & (startFunction[len] != '^')) {
+      strncat(result, &startFunction[len], 1);
+    } else {
+      flag = 1;
+    }
+    len--;
+  }
+  return result;
+}
 
 char *parsePowerFloat(char *insideFunction) {
   int len = strlen(insideFunction);
@@ -125,28 +140,16 @@ char *parsePowerFloat(char *insideFunction) {
 // parses dstartFunction for the power
 int parsePower(char *startFunction) {
 
-  int i = strlen(startFunction);
-  int flag = 0;
-  char *result = (char *)malloc(sizeof(char) * i);
+  char *result = getInsideFunction(startFunction);
   int ret = 0;
-
-  while ((i > 0) & (flag == 0)) {
-    if ((startFunction[i] != 'x') & (startFunction[i] != '^')) {
-      strncat(result, &startFunction[i], 1);
-    } else {
-      flag = 1;
-    }
-    i--;
-  }
 
   int isFraction = 0;
   int len = strlen(result);
 
   for (int z = 0; z < len; z++) {
     if (result[z] == '/') {
-      isFraction = 1;
-      parsePowerFloat(result);
-      break;
+      isFraction = 1; 
+      return 11212;
     }
   }
 
@@ -181,8 +184,15 @@ char *powerRule(char *startFunction) {
   int len = strlen(startFunction);
   int base, power, flag;
   char *result = (char *)malloc(sizeof(char) * len);
+  char *fracPower = (char *)malloc(sizeof(char) * len);
+  char *fracBase = (char *)malloc(sizeof(char) * len);
 
   power = parsePower(startFunction);
+  if(power == 11212) { 
+    fracPower = parsePowerFloat(getInsideFunction(startFunction));
+    fracBase = getInsideFunction(startFunction);
+    fracBase = strrev(fracBase);
+  }
   base = parseBase(startFunction);
   flag = isFunctionOfX(startFunction);
 
@@ -212,7 +222,11 @@ char *powerRule(char *startFunction) {
     } else if (power == 0) {
       sprintf(result, "%d", base);
       return result;
-    } else {
+    } else if(power == 11211) { 
+      sprintf(result, "%sx^%s", fracBase, fracPower);
+      return result;
+    }
+    else {
       sprintf(result, "%dx^%d", base, power);
       return result;
     }
