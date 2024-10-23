@@ -67,8 +67,65 @@ int parseBase(char *startFunction) {
   }
   return ret;
 }
+char* floatToFrac(float f, int divisor) { 
+  int dividend = 0;
+  int completeFlag = 0;
+  float test;
+  
+  char *frac = (char *)malloc(sizeof(char) * 64);;
+  
+  printf("Divisor: %d\n", divisor);
+  while(completeFlag != 1) { 
+    if(f < 0) { 
+      dividend -= 1;
+      test = (float)dividend/(float)divisor;
+      if(test == f) { 
+        completeFlag = 1;
+      }
+    } else if(f >= 0) { 
+      dividend += 1;
+      test = (float)dividend/(float)divisor;
+      if(test == f) { 
+        completeFlag = 1;
+      } 
+    }
+  }
+  sprintf(frac, "%d/%d", dividend, divisor); 
+  printf("%s\n", frac);
+  return frac;
+}
 
-// parses startFunction for the power
+char* parsePowerFloat(char *insideFunction) {
+    int len = strlen(insideFunction);  
+    char *tempDividend = (char *)malloc(sizeof(char) * len);
+    char *tempDivisor = (char *)malloc(sizeof(char) * len);
+    int divisor, dividend; 
+    int divFlag = 1;
+    insideFunction = strrev(insideFunction);
+    for(int q = 0; q < len + 1; q++) { 
+      if((insideFunction[q] != '/') & (divFlag == 1)) { 
+        strncat(tempDividend, &insideFunction[q], 1);
+      } else if(insideFunction[q] == '/') {
+        divFlag = 0; 
+      } else
+      if((insideFunction[q] != '/') & (divFlag == 0)) { 
+        strncat(tempDivisor, &insideFunction[q], 1);
+      }
+    }
+
+  divisor = atoi(tempDivisor);
+  dividend = atoi(tempDividend);
+  printf("dividend: %d\n", dividend);
+  printf("divisor: %d\n", divisor);
+  float frac = (float)dividend / (float)divisor;
+  printf("frac before: %f\n", frac);
+  frac = frac - 1.0;
+  printf("frac after: %f\n", frac);
+  
+  char *ret = floatToFrac(frac, divisor);
+  return NULL;  
+  }
+// parses dstartFunction for the power
 int parsePower(char *startFunction) {
 
   int i = strlen(startFunction);
@@ -91,6 +148,7 @@ int parsePower(char *startFunction) {
   for(int z = 0; z < len; z++) { 
     if(result[z] == '/') { 
       isFraction = 1;
+      parsePowerFloat(result);
       break;
     }
   }
@@ -102,36 +160,7 @@ int parsePower(char *startFunction) {
   }
 
   result = strrev(result);
-
-  if(isFraction == 1) {
-    char *tempDividend = (char *)malloc(sizeof(char) * len);
-    char *tempDivisor = (char *)malloc(sizeof(char) * len);
-    int divisor, dividend; 
-    int divFlag = 1;
-
-    for(int q = 0; q < len + 1; q++) { 
-      if((result[q] != '/') & (divFlag == 1)) { 
-        strncat(tempDivisor, &result[q], 1);
-      } else if(result[q] == '/') {
-        divFlag = 0;
-        printf("divisor: %d\n", divisor);
-      } else
-      if((result[q] != '/') & (divFlag == 0)) { 
-        strncat(tempDividend, &result[q], 1);
-      }
-    }
-
-  dividend = atoi(tempDividend);
-  divisor = atoi(tempDivisor);
-  printf("dividend: %d\n", dividend);
-  printf("divisor: %d\n", divisor);
-  float frac = (float)divisor / (float)dividend;
-  printf("%f", frac);
-   
-  result = strrev(result);
-  ret = atoi(result);
-  free(result);
-  }
+  
   return ret;
 }
 
