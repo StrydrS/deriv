@@ -69,30 +69,31 @@ int parseBase(char *startFunction) {
 char *floatToFrac(float f, int divisor) {
   int dividend = 0;
   int completeFlag = 0;
-  double test;
-
+  float test;
+  int signFlag = 0;
   char *frac = (char *)malloc(sizeof(char) * 64);
+  char test1[32];
+  char test2[32];
 
-  printf("Divisor: %d\n", divisor);
+  sprintf(test2, "%.3f", f);
+
   while (completeFlag != 1) {
-    if ((double)f <= 1.0) {
+    test = (float)dividend / (float)divisor;
+    sprintf(test1, "%.3f", test);
+    if (f <= 1.0) {
       dividend -= 1;
-      test = (double)dividend / (double)divisor;
-      printf("test: %f\n", test);
-      if (test == (double)f) {
+      if (strcmp(test1, test2) == 0) {
         completeFlag = 1;
       }
-    } else if((double)f > 1.0) {
+    } else if (f > 1.0) {
       dividend += 1;
-      test = (double)dividend / (double)divisor;
-      printf("test: %f\n", test);
-      if (test == (double)f) {
+      if (strcmp(test1, test2) == 0) {
         completeFlag = 1;
       }
     }
   }
-  sprintf(frac, "%d/%d", dividend, divisor);
-  printf("%s\n", frac);
+
+  sprintf(frac, "%d/%d", dividend + 1, divisor);
   return frac;
 }
 
@@ -115,15 +116,11 @@ char *parsePowerFloat(char *insideFunction) {
 
   divisor = atoi(tempDivisor);
   dividend = atoi(tempDividend);
-  printf("dividend: %d\n", dividend);
-  printf("divisor: %d\n", divisor);
   float frac = (float)dividend / (float)divisor;
-  printf("frac before: %f\n", frac);
   frac = frac - 1.0;
-  printf("frac after: %f\n", frac);
-
   char *ret = floatToFrac(frac, divisor);
-  return NULL;
+
+  return ret;
 }
 // parses dstartFunction for the power
 int parsePower(char *startFunction) {
