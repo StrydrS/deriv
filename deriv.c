@@ -110,7 +110,6 @@ char *getInsideFunction(char *startFunction) {
     len--;
   }
   return result;
-}
 
 char *parsePowerFloat(char *insideFunction) {
   int len = strlen(insideFunction);
