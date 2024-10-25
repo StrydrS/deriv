@@ -153,13 +153,6 @@ int isPowerFrac(char *startFunction) {
   return isFraction;
 }
 
-char *mulByConst(char *startFunction) { 
-  
-  printf("start function: %s", startFunction);
-
-
-} 
-
 char *powerRule(char *startFunction) { 
   
   int len = strlen(startFunction);
@@ -175,14 +168,12 @@ char *powerRule(char *startFunction) {
     return result;
   } else { 
     power =  parsePower(startFunction);
-    printf("power: %d\n", power);
     base = parseBase(startFunction);
     if(power == 0) {
       if(base == 0) {
         base = 1;
       }
     sprintf(result, "%d", base);
-      printf("%d", power);
     return result; 
   } else if(power != 0) {
       if(base == 0) base = 1;
@@ -200,7 +191,6 @@ char *powerRule(char *startFunction) {
 
   }
   sprintf(result, "%d", base);
-  mulByConst(result);
   return result; 
 }
 
@@ -250,17 +240,43 @@ char *parseTrigFunction(char *startFunction) {
   return result;
 }
 
+int mulByConst(char *startFunction, char *constant) { 
+    
+  int signFlag1 = 0;
+  int signFlag2 = 0;
+  if(startFunction[0] == '-') { signFlag1 = 1; startFunction++; }
+  if(constant[0] == '-') { signFlag2 = 1; constant++; }
+
+  int num1 = atoi(startFunction);
+  int num2 = atoi(constant);
+
+  if((signFlag1 == 0) & (signFlag2 == 0)) { 
+    return num1 * num2; 
+  } else if((signFlag1 == 1) ^ (signFlag2 == 1)) {
+    return -(num1 * num2); 
+  } else { 
+   return num1 * num2;
+  }
+
+}
+
 char *trigDerivative(char *startFunction) {
   int len = strlen(startFunction);
   char *result = (char *)malloc(sizeof(char) * len);
   char *insideFunction = parseTrigFunction(startFunction);
-  int xFlag = 0;
+  char *initialFactor = (char *)malloc(sizeof(char) * len);
+  int firstFactor = 0;
   int signFlag = isNegative(startFunction);
 
   if(signFlag == 1) { 
     startFunction++;
+    sscanf(startFunction, "%d", &firstFactor);
+    sprintf(initialFactor, "-%d", firstFactor);
+  } else {
+    sscanf(startFunction, "%d", &firstFactor);
+    sprintf(initialFactor, "%d", firstFactor);
   }
-  
+
   //logic for trig derivatives
   if(strstr(startFunction, "cos") != NULL) { 
     if(signFlag == 1) { sprintf(result, "sin(%s)", insideFunction); } 
@@ -286,11 +302,56 @@ char *trigDerivative(char *startFunction) {
     return result;
   }
 
-  printf("power rule returns: %s\n", powerRule(startFunction));
+  char *insideDeriv = powerRule(insideFunction);
 
-  return result;
+  if(result[0] == '-') { signFlag = 1; } else { signFlag = 0; }
+  if(signFlag == 1) { 
+    result++; 
+    strcat(insideDeriv, result);
+    memmove(insideDeriv + 1, insideDeriv, strlen(insideDeriv) + 1);
+    insideDeriv[0] = '-';
+  } else {
+    strcat(insideDeriv, result);
+  }
+  
+  if(firstFactor != 0) { 
+    firstFactor = mulByConst(insideDeriv, initialFactor); 
+    while(insideDeriv[0] != 'x') {
+      insideDeriv++;
+    }
+    sprintf(result, "%d%s", firstFactor, insideDeriv); 
+    return result;
+  }
+
+  return insideDeriv;
 }
 
+char *productRule(char *startFunction) {
+
+  int len = strlen(startFunction);
+  char *result = (char *)malloc(sizeof(char) * len); 
+
+  return NULL;
+
+}
+
+int isProduct(char *startFunction) { 
+
+  int len = strlen(startFunction);
+  int xCount = 0;
+  int parenCount = 0;
+
+  for(int i = 0; i < len; i++) { 
+    if(startFunction[i] != 'x') { xCount++; }
+    if(startFunction[i] != '(') { parenCount++; }
+  }
+
+  if(xCount < parenCount) { 
+    return 1;
+  } else { 
+    return 0;
+  }
+}
 char *differentiate(char *startFunction) {
   int len = strlen(startFunction);
   char *result = (char *)malloc(sizeof(char) * len);
@@ -299,6 +360,7 @@ char *differentiate(char *startFunction) {
   int isFofX = isFunctionOfX(startFunction); 
   if(isFofX == 0) { strcpy(result, "0"); return result; }
   
+  if(isProduct(startFunction) == 1) { printf("is product\n"); } else { printf("is not product\n"); }
   if(strstr(startFunction, "^") != NULL) { result = powerRule(startFunction); } 
   if(startFunction[len-1] == 'x') { startFunction[len-1] = '\0'; return startFunction; }
   int isTrigFlag = isTrigFunction(startFunction);
