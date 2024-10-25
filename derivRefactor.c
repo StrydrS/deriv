@@ -330,11 +330,28 @@ char *productRule(char *startFunction) {
 
   int len = strlen(startFunction);
   char *result = (char *)malloc(sizeof(char) * len); 
+  char *function1 = (char *)malloc(sizeof(char) * len);
+  char *function2 = (char *)malloc(sizeof(char) * len);
+  int firstFunction = 1;
+  int hasExponent = 0;
 
-  return NULL;
-
+  while(startFunction[len] 
+  //split function in to parts
+  for(int i = 0; i < len; i++) { 
+    if((startFunction[i] != 'x') & (startFunction[i+1] != '^')) { 
+      if(firstFunction == 1) { 
+        strncat(function1, &startFunction[i], 1);
+      }
+    } else if((startFunction[i] != 'x') & (startFunction[i+1] == '^')) { 
+    
+    } else{
+      firstFunction = 0;
+    }
+  }
+  sprintf(result, "%sx", function1);
+  printf("result (broken still): %s\n", result);
+ return NULL;
 }
-
 int isProduct(char *startFunction) { 
 
   int len = strlen(startFunction);
@@ -352,6 +369,7 @@ int isProduct(char *startFunction) {
     return 0;
   }
 }
+
 char *differentiate(char *startFunction) {
   int len = strlen(startFunction);
   char *result = (char *)malloc(sizeof(char) * len);
@@ -360,7 +378,7 @@ char *differentiate(char *startFunction) {
   int isFofX = isFunctionOfX(startFunction); 
   if(isFofX == 0) { strcpy(result, "0"); return result; }
   
-  if(isProduct(startFunction) == 1) { printf("is product\n"); } else { printf("is not product\n"); }
+  if(isProduct(startFunction) == 1) { result = productRule(startFunction); return result; }
   if(strstr(startFunction, "^") != NULL) { result = powerRule(startFunction); } 
   if(startFunction[len-1] == 'x') { startFunction[len-1] = '\0'; return startFunction; }
   int isTrigFlag = isTrigFunction(startFunction);
